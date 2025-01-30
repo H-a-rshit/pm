@@ -42,9 +42,19 @@ export const importPasswords = async (setPasswords: (passwords: PasswordEntry[])
 
     console.log("Imported passwords:", importedPasswords);
 
-    const updatedPasswords = [...existingPasswords, ...importedPasswords];
-    console.log("Updated passwords:", updatedPasswords);
+    // Ensure unique IDs for imported passwords
+    const existingIds = new Set(existingPasswords.map(password => password.id));
+    let maxId = Math.max(0, ...existingIds);
 
+    importedPasswords = importedPasswords.map(password => {
+      if (existingIds.has(password.id)) {
+        maxId += 1;
+        return { ...password, id: maxId };
+      }
+      return password;
+    });
+
+    const updatedPasswords = [...existingPasswords, ...importedPasswords];
     setPasswords(updatedPasswords);
     savePasswords(updatedPasswords);
     console.log("Passwords state after import:", updatedPasswords);
