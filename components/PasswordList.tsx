@@ -1,11 +1,13 @@
 import React from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import { PasswordEntry } from '../utils/storage';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 interface PasswordListProps {
   passwords: PasswordEntry[];
   flippedId: number | null;
   toggleFlip: (id: number) => void;
+  openEditModal: (passwordEntry: PasswordEntry) => void;
   scrollY: Animated.Value;
   handleScroll: (event: any) => void;
   indicatorSize: Animated.AnimatedInterpolation<number>;
@@ -16,6 +18,7 @@ const PasswordList: React.FC<PasswordListProps> = ({
   passwords,
   flippedId,
   toggleFlip,
+  openEditModal,
   scrollY,
   handleScroll,
   indicatorSize,
@@ -28,6 +31,9 @@ const PasswordList: React.FC<PasswordListProps> = ({
       <Text style={styles.cardText}>
         {flippedId === item.id ? item.password : item.description}
       </Text>
+      <TouchableOpacity onPress={() => openEditModal(item)} style={styles.editButton}>
+        <Icon name="edit" size={24} color="#E1306C" />
+      </TouchableOpacity>
     </TouchableOpacity>
   );
 
@@ -54,6 +60,8 @@ const styles = StyleSheet.create({
     paddingBottom: 80, // Ensure space for the button
   },
   card: {
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: 16,
     marginVertical: 8,
     backgroundColor: '#fff',
@@ -63,6 +71,12 @@ const styles = StyleSheet.create({
   },
   cardText: {
     fontSize: 16,
+    flex: 1,
+  },
+  editButton: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 8,
   },
 });
 

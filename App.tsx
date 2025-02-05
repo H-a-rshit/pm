@@ -4,13 +4,16 @@ import { PasswordEntry, loadPasswords, savePasswords } from './utils/storage';
 import { exportPasswords, importPasswords } from './utils/fileoperations';
 import PasswordList from './components/PasswordList';
 import AddPasswordModal from './components/AddPasswordModal';
+import EditPasswordModal from './components/EditPasswordModal';
 
 const App = () => {
   const [passwords, setPasswords] = useState<PasswordEntry[]>([]);
   const [filteredPasswords, setFilteredPasswords] = useState<PasswordEntry[]>([]);
-  const [showModal, setShowModal] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [newDescription, setNewDescription] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [editPasswordEntry, setEditPasswordEntry] = useState<PasswordEntry | null>(null);
   const [flippedId, setFlippedId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -46,12 +49,26 @@ const App = () => {
       savePasswords(updatedPasswords);
       setNewDescription("");
       setNewPassword("");
-      setShowModal(false);
+      setShowAddModal(false);
     }
+  };
+
+  const editPassword = (id: number, description: string, password: string) => {
+    const updatedPasswords = passwords.map(passwordEntry =>
+      passwordEntry.id === id ? { ...passwordEntry, description, password } : passwordEntry
+    );
+    setPasswords(updatedPasswords);
+    savePasswords(updatedPasswords);
+    setShowEditModal(false);
   };
 
   const toggleFlip = (id: number) => {
     setFlippedId(flippedId === id ? null : id);
+  };
+
+  const openEditModal = (passwordEntry: PasswordEntry) => {
+    setEditPasswordEntry(passwordEntry);
+    setShowEditModal(true);
   };
 
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -77,7 +94,7 @@ const App = () => {
         onChangeText={setSearchQuery}
       />
       <View style={styles.buttonContainer}>
-        <Button title="Add Password" onPress={() => setShowModal(true)} />
+        <Button title="Add Password" onPress={() => setShowAddModal(true)} />
         <Button title="Export Passwords" onPress={() => exportPasswords(passwords)} />
         <Button title="Import Passwords" onPress={() => importPasswords(setPasswords, passwords)} />
       </View>
@@ -85,20 +102,29 @@ const App = () => {
         passwords={filteredPasswords}
         flippedId={flippedId}
         toggleFlip={toggleFlip}
+        openEditModal={openEditModal}
         scrollY={scrollY}
         handleScroll={handleScroll}
         indicatorSize={indicatorSize}
         translateY={translateY}
       />
       <AddPasswordModal
-        showModal={showModal}
-        setShowModal={setShowModal}
+        showModal={showAddModal}
+        setShowModal={setShowAddModal}
         newDescription={newDescription}
         setNewDescription={setNewDescription}
         newPassword={newPassword}
         setNewPassword={setNewPassword}
         addPassword={addPassword}
       />
+      {editPasswordEntry && (
+        <EditPasswordModal
+          showModal={showEditModal}
+          setShowModal={setShowEditModal}
+          passwordEntry={editPasswordEntry}
+          editPassword={editPassword}
+        />
+      )}
     </View>
   );
 };
