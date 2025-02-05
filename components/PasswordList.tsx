@@ -27,14 +27,16 @@ const PasswordList: React.FC<PasswordListProps> = ({
   console.log("Rendering PasswordList, passwords:", passwords);
 
   const renderItem = ({ item }: { item: PasswordEntry }) => (
-    <TouchableOpacity onPress={() => toggleFlip(item.id)} style={styles.card}>
-      <Text style={styles.cardText}>
-        {flippedId === item.id ? item.password : item.description}
-      </Text>
-      <TouchableOpacity onPress={() => openEditModal(item)} style={styles.editButton}>
-        <Icon name="edit" size={24} color="#E1306C" />
+    <View style={styles.cardContainer}>
+      <TouchableOpacity onPress={() => toggleFlip(item.id)} style={styles.card}>
+        <Text style={styles.cardText}>
+          {flippedId === item.id ? item.password : item.description}
+        </Text>
+        <TouchableOpacity onPress={() => openEditModal(item)} style={styles.editButton}>
+          <Icon name="edit" size={24} color="#E1306C" />
+        </TouchableOpacity>
       </TouchableOpacity>
-    </TouchableOpacity>
+    </View>
   );
 
   return (
@@ -59,11 +61,16 @@ const styles = StyleSheet.create({
   listContent: {
     paddingBottom: 80, // Ensure space for the button
   },
+  cardContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginVertical: 8,
+  },
   card: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
-    marginVertical: 8,
     backgroundColor: '#fff',
     borderRadius: 8,
     borderWidth: 2,
