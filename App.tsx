@@ -62,6 +62,12 @@ const App = () => {
     setShowEditModal(false);
   };
 
+  const deletePassword = (id: number) => {
+    const updatedPasswords = passwords.filter(passwordEntry => passwordEntry.id !== id);
+    setPasswords(updatedPasswords);
+    savePasswords(updatedPasswords);
+  };
+
   const toggleFlip = (id: number) => {
     setFlippedId(flippedId === id ? null : id);
   };
@@ -123,6 +129,7 @@ const App = () => {
           setShowModal={setShowEditModal}
           passwordEntry={editPasswordEntry}
           editPassword={editPassword}
+          deletePassword={deletePassword}
         />
       )}
     </View>

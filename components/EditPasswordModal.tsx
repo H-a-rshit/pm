@@ -1,4 +1,3 @@
-// filepath: components/EditPasswordModal.tsx
 import React, { useState, useEffect } from 'react';
 import { Modal, View, TextInput, Button, StyleSheet } from 'react-native';
 import { PasswordEntry } from '../utils/storage';
@@ -8,6 +7,7 @@ interface EditPasswordModalProps {
   setShowModal: (visible: boolean) => void;
   passwordEntry: PasswordEntry | null;
   editPassword: (id: number, description: string, password: string) => void;
+  deletePassword: (id: number) => void;
 }
 
 const EditPasswordModal: React.FC<EditPasswordModalProps> = ({
@@ -15,6 +15,7 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({
   setShowModal,
   passwordEntry,
   editPassword,
+  deletePassword,
 }) => {
   const [description, setDescription] = useState(passwordEntry?.description || '');
   const [password, setPassword] = useState(passwordEntry?.password || '');
@@ -29,6 +30,13 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({
   const handleSave = () => {
     if (passwordEntry) {
       editPassword(passwordEntry.id, description, password);
+      setShowModal(false);
+    }
+  };
+
+  const handleDelete = () => {
+    if (passwordEntry) {
+      deletePassword(passwordEntry.id);
       setShowModal(false);
     }
   };
@@ -49,8 +57,11 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({
           onChangeText={setPassword}
           secureTextEntry
         />
-        <Button title="Save" onPress={handleSave} />
-        <Button title="Cancel" onPress={() => setShowModal(false)} />
+        <View style={styles.buttonContainer}>
+          <Button title="Save" onPress={handleSave} />
+          <Button title="Cancel" onPress={() => setShowModal(false)} />
+          <Button title="Delete" onPress={handleDelete} color="red" />
+        </View>
       </View>
     </Modal>
   );
@@ -68,6 +79,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 16,
     paddingHorizontal: 8,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
 });
 
