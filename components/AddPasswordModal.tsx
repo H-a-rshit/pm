@@ -1,4 +1,3 @@
-<script src="http://localhost:8097"></script>
 import React from 'react';
 import { View, TextInput, Modal, Button, StyleSheet } from 'react-native';
 
@@ -9,6 +8,8 @@ interface AddPasswordModalProps {
   setNewDescription: (text: string) => void;
   newPassword: string;
   setNewPassword: (text: string) => void;
+  newValidity: string;
+  setNewValidity: (text: string) => void;
   addPassword: () => void;
 }
 
@@ -19,6 +20,8 @@ const AddPasswordModal: React.FC<AddPasswordModalProps> = ({
   setNewDescription,
   newPassword,
   setNewPassword,
+  newValidity,
+  setNewValidity,
   addPassword,
 }) => {
   return (
@@ -36,6 +39,13 @@ const AddPasswordModal: React.FC<AddPasswordModalProps> = ({
           onChangeText={setNewPassword}
           style={styles.input}
           secureTextEntry
+        />
+        <TextInput
+          placeholder="Validity (days)"
+          value={newValidity}
+          onChangeText={setNewValidity}
+          style={styles.input}
+          keyboardType="numeric"
         />
         <View style={styles.modalButtons}>
           <Button title="Cancel" onPress={() => setShowModal(false)} />

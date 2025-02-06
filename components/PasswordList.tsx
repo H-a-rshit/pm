@@ -26,18 +26,32 @@ const PasswordList: React.FC<PasswordListProps> = ({
 }) => {
   console.log("Rendering PasswordList, passwords:", passwords);
 
-  const renderItem = ({ item }: { item: PasswordEntry }) => (
-    <View style={styles.cardContainer}>
-      <TouchableOpacity onPress={() => toggleFlip(item.id)} style={styles.card}>
-        <Text style={styles.cardText}>
-          {flippedId === item.id ? item.password : item.description}
-        </Text>
-        <TouchableOpacity onPress={() => openEditModal(item)} style={styles.editButton}>
-          <Icon name="edit" size={24} color="#E1306C" />
+  const calculateRemainingDays = (passwordEntry: PasswordEntry) => {
+    const createdAt = passwordEntry.createdAt;
+    const validityDays = passwordEntry.validity;
+    const currentDate = new Date().getTime();
+    const expiryDate = createdAt + validityDays * 24 * 60 * 60 * 1000;
+    const remainingDays = Math.ceil((expiryDate - currentDate) / (24 * 60 * 60 * 1000));
+    return remainingDays;
+  };
+
+  const renderItem = ({ item }: { item: PasswordEntry }) => {
+    const remainingDays = calculateRemainingDays(item);
+    const isExpiringSoon = remainingDays <= 5;
+
+    return (
+      <View style={[styles.cardContainer, isExpiringSoon && styles.expiringCardContainer]}>
+        <TouchableOpacity onPress={() => toggleFlip(item.id)} style={[styles.card, isExpiringSoon && styles.expiringCard]}>
+          <Text style={[styles.cardText, isExpiringSoon && styles.expiringCardText]}>
+            {flippedId === item.id ? item.password : item.description}
+          </Text>
+          <TouchableOpacity onPress={() => openEditModal(item)} style={styles.editButton}>
+            <Icon name="edit" size={24} color={isExpiringSoon ? "#fff" : "#E1306C"} />
+          </TouchableOpacity>
         </TouchableOpacity>
-      </TouchableOpacity>
-    </View>
-  );
+      </View>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -67,6 +81,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginVertical: 8,
   },
+  expiringCardContainer: {
+    backgroundColor: 'black',
+  },
   card: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -76,9 +93,15 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#E1306C', // Instagram logo color
   },
+  expiringCard: {
+    backgroundColor: 'black',
+  },
   cardText: {
     fontSize: 16,
     flex: 1,
+  },
+  expiringCardText: {
+    color: 'white',
   },
   editButton: {
     justifyContent: 'center',

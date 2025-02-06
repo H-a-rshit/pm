@@ -6,7 +6,7 @@ interface EditPasswordModalProps {
   showModal: boolean;
   setShowModal: (visible: boolean) => void;
   passwordEntry: PasswordEntry | null;
-  editPassword: (id: number, description: string, password: string) => void;
+  editPassword: (id: number, description: string, password: string, validity: number) => void;
   deletePassword: (id: number) => void;
 }
 
@@ -19,17 +19,19 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({
 }) => {
   const [description, setDescription] = useState(passwordEntry?.description || '');
   const [password, setPassword] = useState(passwordEntry?.password || '');
+  const [validity, setValidity] = useState(passwordEntry?.validity.toString() || '');
 
   useEffect(() => {
     if (passwordEntry) {
       setDescription(passwordEntry.description);
       setPassword(passwordEntry.password);
+      setValidity(passwordEntry.validity.toString());
     }
   }, [passwordEntry]);
 
   const handleSave = () => {
     if (passwordEntry) {
-      editPassword(passwordEntry.id, description, password);
+      editPassword(passwordEntry.id, description, password, parseInt(validity));
       setShowModal(false);
     }
   };
@@ -56,6 +58,13 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({
           value={password}
           onChangeText={setPassword}
           secureTextEntry
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Validity (days)"
+          value={validity}
+          onChangeText={setValidity}
+          keyboardType="numeric"
         />
         <View style={styles.buttonContainer}>
           <Button title="Save" onPress={handleSave} />

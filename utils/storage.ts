@@ -4,6 +4,8 @@ export interface PasswordEntry {
   id: number;
   description: string;
   password: string;
+  validity: number;
+  createdAt: number;
 }
 
 export const loadPasswords = async (): Promise<PasswordEntry[]> => {

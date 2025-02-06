@@ -13,6 +13,7 @@ const App = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [newDescription, setNewDescription] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [newValidity, setNewValidity] = useState("");
   const [editPasswordEntry, setEditPasswordEntry] = useState<PasswordEntry | null>(null);
   const [flippedId, setFlippedId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -37,25 +38,54 @@ const App = () => {
     setFilteredPasswords(filtered);
   }, [searchQuery, passwords]);
 
+  useEffect(() => {
+    const updateValidityDays = () => {
+      const updatedPasswords = passwords.map(passwordEntry => {
+        const createdAt = passwordEntry.createdAt;
+        const validityDays = passwordEntry.validity;
+        const currentDate = new Date().getTime();
+        const expiryDate = createdAt + validityDays * 24 * 60 * 60 * 1000;
+        const remainingDays = Math.ceil((expiryDate - currentDate) / (24 * 60 * 60 * 1000));
+        return { ...passwordEntry, validity: remainingDays };
+      });
+      setPasswords(updatedPasswords);
+      savePasswords(updatedPasswords);
+    };
+
+    const now = new Date();
+    const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0);
+    const timeToMidnight = midnight.getTime() - now.getTime();
+
+    const timeoutId = setTimeout(() => {
+      updateValidityDays();
+      setInterval(updateValidityDays, 24 * 60 * 60 * 1000); // Update every 24 hours
+    }, timeToMidnight);
+
+    return () => clearTimeout(timeoutId);
+  }, [passwords]);
+
   const addPassword = () => {
-    if (newDescription && newPassword) {
+    if (newDescription && newPassword && newValidity) {
       const newPasswordEntry: PasswordEntry = {
         id: passwords.length > 0 ? passwords[passwords.length - 1].id + 1 : 1,
         description: newDescription,
         password: newPassword,
+        validity: parseInt(newValidity),
+        createdAt: new Date().getTime(),
       };
       const updatedPasswords = [...passwords, newPasswordEntry];
       setPasswords(updatedPasswords);
       savePasswords(updatedPasswords);
       setNewDescription("");
       setNewPassword("");
+      setNewValidity("");
       setShowAddModal(false);
     }
   };
 
-  const editPassword = (id: number, description: string, password: string) => {
+  const editPassword = (id: number, description: string, password: string, validity: number) => {
     const updatedPasswords = passwords.map(passwordEntry =>
-      passwordEntry.id === id ? { ...passwordEntry, description, password } : passwordEntry
+      passwordEntry.id === id ? { ...passwordEntry, description, password, validity } : passwordEntry
     );
     setPasswords(updatedPasswords);
     savePasswords(updatedPasswords);
@@ -121,6 +151,8 @@ const App = () => {
         setNewDescription={setNewDescription}
         newPassword={newPassword}
         setNewPassword={setNewPassword}
+        newValidity={newValidity}
+        setNewValidity={setNewValidity}
         addPassword={addPassword}
       />
       {editPasswordEntry && (
