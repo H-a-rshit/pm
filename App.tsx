@@ -1,22 +1,31 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Button, StyleSheet, Animated, TextInput } from "react-native";
+import { View, Button, StyleSheet, Animated, TextInput, TouchableOpacity, Text } from "react-native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PasswordEntry, loadPasswords, savePasswords } from './utils/storage';
 import { exportPasswords, importPasswords } from './utils/fileoperations';
 import PasswordList from './components/PasswordList';
 import AddPasswordModal from './components/AddPasswordModal';
 import EditPasswordModal from './components/EditPasswordModal';
+import LoginScreen from './components/LoginScreen';
+import SettingsScreen from './components/SettingsScreen';
 
 const App = () => {
   const [passwords, setPasswords] = useState<PasswordEntry[]>([]);
   const [filteredPasswords, setFilteredPasswords] = useState<PasswordEntry[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [newDescription, setNewDescription] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [newValidity, setNewValidity] = useState("");
   const [editPasswordEntry, setEditPasswordEntry] = useState<PasswordEntry | null>(null);
   const [flippedId, setFlippedId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+  };
 
   useEffect(() => {
     const fetchPasswords = async () => {
@@ -121,14 +130,33 @@ const App = () => {
 
   const translateY = Animated.multiply(scrollY, indicatorSize);
 
+  useEffect(() => {
+    const checkAuthentication = async () => {
+      const pin = await AsyncStorage.getItem('appPin');
+      if (!pin) {
+        setIsAuthenticated(true); // No PIN set, proceed to the app
+      }
+    };
+    checkAuthentication();
+  }, []);
+
+  if (!isAuthenticated) {
+    return <LoginScreen onLogin={handleLogin} />;
+  }
+
   return (
     <View style={styles.container}>
-      <TextInput
-        style={styles.searchBar}
-        placeholder="Search..."
-        value={searchQuery}
-        onChangeText={setSearchQuery}
-      />
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchBar}
+          placeholder="Search..."
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+        <TouchableOpacity style={styles.settingsButton} onPress={() => setShowSettingsModal(true)}>
+          <Text style={styles.settingsButtonText}>Settings</Text>
+        </TouchableOpacity>
+      </View>
       <View style={styles.buttonContainer}>
         <Button title="Add Password" onPress={() => setShowAddModal(true)} />
         <Button title="Export Passwords" onPress={() => exportPasswords(passwords)} />
@@ -164,6 +192,9 @@ const App = () => {
           deletePassword={deletePassword}
         />
       )}
+      {showSettingsModal && (
+        <SettingsScreen onClose={() => setShowSettingsModal(false)} />
+      )}
     </View>
   );
 };
@@ -173,12 +204,27 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
   },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
   searchBar: {
+    flex: 1,
     height: 40,
     borderColor: 'gray',
     borderWidth: 1,
-    marginBottom: 16,
     paddingHorizontal: 8,
+  },
+  settingsButton: {
+    backgroundColor: 'orange',
+    padding: 10,
+    marginLeft: 10,
+    borderRadius: 5,
+  },
+  settingsButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
   buttonContainer: {
     flexDirection: 'row',
