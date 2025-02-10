@@ -19,20 +19,14 @@ const PasswordList: React.FC<PasswordListProps> = ({
   flippedId,
   toggleFlip,
   openEditModal,
-  scrollY,
   handleScroll,
-  indicatorSize,
-  translateY,
 }) => {
-  console.log("Rendering PasswordList, passwords:", passwords);
-
   const calculateRemainingDays = (passwordEntry: PasswordEntry) => {
     const createdAt = passwordEntry.createdAt;
     const validityDays = passwordEntry.validity;
     const currentDate = new Date().getTime();
     const expiryDate = createdAt + validityDays * 24 * 60 * 60 * 1000;
-    const remainingDays = Math.ceil((expiryDate - currentDate) / (24 * 60 * 60 * 1000));
-    return remainingDays;
+    return Math.ceil((expiryDate - currentDate) / (24 * 60 * 60 * 1000));
   };
 
   const renderItem = ({ item }: { item: PasswordEntry }) => {
@@ -40,16 +34,21 @@ const PasswordList: React.FC<PasswordListProps> = ({
     const isExpiringSoon = remainingDays <= 5;
 
     return (
-      <View style={[styles.cardContainer, isExpiringSoon && styles.expiringCardContainer]}>
-        <TouchableOpacity onPress={() => toggleFlip(item.id)} style={[styles.card, isExpiringSoon && styles.expiringCard]}>
+      <TouchableOpacity
+        onPress={() => toggleFlip(item.id)}
+        style={[styles.card, isExpiringSoon && styles.expiringCard]}>
+        <View style={styles.cardTextContainer}>
           <Text style={[styles.cardText, isExpiringSoon && styles.expiringCardText]}>
             {flippedId === item.id ? item.password : item.description}
           </Text>
-          <TouchableOpacity onPress={() => openEditModal(item)} style={styles.editButton}>
-            <Icon name="edit" size={24} color={isExpiringSoon ? "#fff" : "#E1306C"} />
-          </TouchableOpacity>
+          <Text style={[styles.remainingDays, isExpiringSoon && styles.expiringDaysText]}>
+            {remainingDays} days left
+          </Text>
+        </View>
+        <TouchableOpacity onPress={() => openEditModal(item)} style={styles.editButton}>
+          <Icon name="edit" size={22} color={isExpiringSoon ? "#fff" : "#007bff"} />
         </TouchableOpacity>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -71,42 +70,52 @@ const PasswordList: React.FC<PasswordListProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingHorizontal: 16,
   },
   listContent: {
-    paddingBottom: 80, // Ensure space for the button
-  },
-  cardContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginVertical: 8,
-  },
-  expiringCardContainer: {
-    backgroundColor: 'black',
+    paddingBottom: 80,
   },
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
     backgroundColor: '#fff',
-    borderRadius: 8,
-    borderWidth: 2,
-    borderColor: '#E1306C', // Instagram logo color
+    padding: 16,
+    marginVertical: 6,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+    borderLeftWidth: 5,
+    borderLeftColor: '#007bff',
   },
   expiringCard: {
-    backgroundColor: 'black',
+    backgroundColor: '#ff4d4d',
+    borderLeftColor: '#000000',
+  },
+  cardTextContainer: {
+    flex: 1,
   },
   cardText: {
     fontSize: 16,
-    flex: 1,
+    fontWeight: '500',
+    color: '#333',
   },
   expiringCardText: {
-    color: 'white',
+    color: '#fff',
+  },
+  remainingDays: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 4,
+  },
+  expiringDaysText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
   editButton: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 8,
+    padding: 10,
   },
 });
 

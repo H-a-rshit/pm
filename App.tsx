@@ -153,9 +153,14 @@ const App = () => {
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
-        <TouchableOpacity style={styles.settingsButton} onPress={() => setShowSettingsModal(true)}>
+        {/* <TouchableOpacity style={styles.settingsButton} onPress={() => setShowSettingsModal(true)}>
           <Text style={styles.settingsButtonText}>Settings</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
+
+<TouchableOpacity style={styles.settingsButton} onPress={() => setShowSettingsModal(true)}>
+  <Text style={styles.settingsButtonText}>⚙ Settings</Text>
+</TouchableOpacity>
+
       </View>
       {/* <View style={styles.buttonContainer}>
         <Button title="Add Password" onPress={() => setShowAddModal(true)} />
@@ -234,16 +239,26 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   settingsButton: {
-    backgroundColor: '#ffa500',
-    padding: 10,
-    marginLeft: 10,
+    backgroundColor: '#28a745', // Better contrast (green shade)
+    paddingVertical: 10,
+    paddingHorizontal: 16,
     borderRadius: 8,
-    elevation: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 10,
+    elevation: 3, // Shadow for Android
+    shadowColor: '#000', // Shadow for iOS
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    flexDirection: 'row',
   },
   settingsButtonText: {
     color: '#fff',
     fontWeight: 'bold',
+    fontSize: 16,
   },
+  
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, Button, StyleSheet, Text, Switch } from 'react-native';
+import { View, TextInput, TouchableOpacity, StyleSheet, Text, Switch, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface SettingsScreenProps {
@@ -24,35 +24,35 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onClose }) => {
 
   const handleEnablePin = async () => {
     if (newPin !== confirmNewPin) {
-      alert('New PIN and confirmation do not match');
+      Alert.alert('Error', 'New PIN and confirmation do not match');
       return;
     }
     await AsyncStorage.setItem('appPin', newPin);
     setIsPinEnabled(true);
     setIsFirstTime(false);
-    alert('PIN protection enabled');
+    Alert.alert('Success', 'PIN protection enabled');
     onClose();
   };
 
   const handleDisablePin = async () => {
     await AsyncStorage.removeItem('appPin');
     setIsPinEnabled(false);
-    alert('PIN protection disabled');
+    Alert.alert('Success', 'PIN protection disabled');
     onClose();
   };
 
   const handleChangePin = async () => {
     const storedPin = await AsyncStorage.getItem('appPin');
     if (storedPin !== currentPin) {
-      alert('Current PIN is incorrect');
+      Alert.alert('Error', 'Current PIN is incorrect');
       return;
     }
     if (newPin !== confirmNewPin) {
-      alert('New PIN and confirmation do not match');
+      Alert.alert('Error', 'New PIN and confirmation do not match');
       return;
     }
     await AsyncStorage.setItem('appPin', newPin);
-    alert('PIN changed successfully');
+    Alert.alert('Success', 'PIN changed successfully');
     onClose();
   };
 
@@ -60,7 +60,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onClose }) => {
     <View style={styles.container}>
       <Text style={styles.title}>Settings</Text>
       <View style={styles.switchContainer}>
-        <Text>Enable PIN Protection</Text>
+        <Text style={styles.switchLabel}>Enable PIN Protection</Text>
         <Switch
           value={isPinEnabled}
           onValueChange={async (value) => {
@@ -73,8 +73,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onClose }) => {
           }}
         />
       </View>
+
       {isPinEnabled && (
-        <>
+        <View style={styles.card}>
           {!isFirstTime && (
             <TextInput
               style={styles.input}
@@ -101,10 +102,21 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onClose }) => {
             secureTextEntry
             keyboardType="numeric"
           />
-          <Button title={isFirstTime ? "Set PIN" : "Change PIN"} onPress={isFirstTime ? handleEnablePin : handleChangePin} />
-        </>
+
+          <TouchableOpacity
+            style={styles.saveButton}
+            onPress={isFirstTime ? handleEnablePin : handleChangePin}
+          >
+            <Text style={styles.saveButtonText}>
+              {isFirstTime ? 'Set PIN' : 'Change PIN'}
+            </Text>
+          </TouchableOpacity>
+        </View>
       )}
-      <Button title="Close" onPress={onClose} />
+
+      <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+        <Text style={styles.closeButtonText}>Close</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -113,25 +125,81 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    padding: 16,
+    padding: 20,
+    backgroundColor: '#f5f5f5',
   },
   title: {
     fontSize: 24,
-    marginBottom: 16,
+    fontWeight: 'bold',
     textAlign: 'center',
+    marginBottom: 20,
+    color: '#333',
   },
   switchContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    marginBottom: 20,
+  },
+  switchLabel: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#333',
+  },
+  card: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 12,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   input: {
-    height: 40,
-    borderColor: 'gray',
+    height: 48,
+    borderColor: '#ccc',
     borderWidth: 1,
-    marginBottom: 16,
-    paddingHorizontal: 8,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    backgroundColor: '#fff',
+    fontSize: 16,
+    marginBottom: 12,
+  },
+  saveButton: {
+    backgroundColor: '#007bff',
+    paddingVertical: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 10,
+    elevation: 3,
+  },
+  saveButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  closeButton: {
+    backgroundColor: '#dc3545',
+    paddingVertical: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 20,
+    elevation: 3,
+  },
+  closeButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });
 
