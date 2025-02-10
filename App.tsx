@@ -157,11 +157,25 @@ const App = () => {
           <Text style={styles.settingsButtonText}>Settings</Text>
         </TouchableOpacity>
       </View>
-      <View style={styles.buttonContainer}>
+      {/* <View style={styles.buttonContainer}>
         <Button title="Add Password" onPress={() => setShowAddModal(true)} />
         <Button title="Export Passwords" onPress={() => exportPasswords(passwords)} />
         <Button title="Import Passwords" onPress={() => importPasswords(setPasswords, passwords)} />
+      </View> */}
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.actionButton} onPress={() => setShowAddModal(true)}>
+          <Text style={styles.buttonText}>Add</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.actionButton} onPress={() => exportPasswords(passwords)}>
+          <Text style={styles.buttonText}>Export</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.actionButton} onPress={() => importPasswords(setPasswords, passwords)}>
+          <Text style={styles.buttonText}>Import</Text>
+        </TouchableOpacity>
       </View>
+
+
+
       <PasswordList
         passwords={filteredPasswords}
         flippedId={flippedId}
@@ -203,6 +217,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+    backgroundColor: '#f5f5f5',
   },
   searchContainer: {
     flexDirection: 'row',
@@ -212,18 +227,21 @@ const styles = StyleSheet.create({
   searchBar: {
     flex: 1,
     height: 40,
-    borderColor: 'gray',
+    borderColor: '#ccc',
     borderWidth: 1,
-    paddingHorizontal: 8,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    backgroundColor: '#fff',
   },
   settingsButton: {
-    backgroundColor: 'orange',
+    backgroundColor: '#ffa500',
     padding: 10,
     marginLeft: 10,
-    borderRadius: 5,
+    borderRadius: 8,
+    elevation: 2,
   },
   settingsButtonText: {
-    color: 'white',
+    color: '#fff',
     fontWeight: 'bold',
   },
   buttonContainer: {
@@ -231,6 +249,27 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 16,
   },
+  button: {
+    backgroundColor: '#007bff',
+    padding: 10,
+    borderRadius: 8,
+    elevation: 2,
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  actionButton: {
+    flex: 1,
+    backgroundColor: '#007bff',
+    padding: 12,
+    marginHorizontal: 5,
+    borderRadius: 8,
+    alignItems: 'center',
+    elevation: 3, // Adds shadow on Android
+  },
+
 });
 
 export default App;
