@@ -284,6 +284,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     elevation: 3, // Adds shadow on Android
   },
+  cardContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start', // Align cards with buttons
+    marginVertical: 8,
+  },
+  
+
+
+
 
 });
 

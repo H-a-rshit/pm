@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import { PasswordEntry } from '../utils/storage';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 
 interface PasswordListProps {
   passwords: PasswordEntry[];
@@ -36,7 +35,8 @@ const PasswordList: React.FC<PasswordListProps> = ({
     return (
       <TouchableOpacity
         onPress={() => toggleFlip(item.id)}
-        style={[styles.card, isExpiringSoon && styles.expiringCard]}>
+        style={[styles.card, isExpiringSoon && styles.expiringCard]}
+      >
         <View style={styles.cardTextContainer}>
           <Text style={[styles.cardText, isExpiringSoon && styles.expiringCardText]}>
             {flippedId === item.id ? item.password : item.description}
@@ -46,7 +46,7 @@ const PasswordList: React.FC<PasswordListProps> = ({
           </Text>
         </View>
         <TouchableOpacity onPress={() => openEditModal(item)} style={styles.editButton}>
-          <Icon name="edit" size={22} color={isExpiringSoon ? "#fff" : "#007bff"} />
+          <Text style={styles.editButtonText}>Edit</Text>
         </TouchableOpacity>
       </TouchableOpacity>
     );
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
   },
   expiringCard: {
     backgroundColor: '#ff4d4d',
-    borderLeftColor: '#000000',
+    borderLeftColor: '#000',
   },
   cardTextContainer: {
     flex: 1,
@@ -116,6 +116,13 @@ const styles = StyleSheet.create({
   },
   editButton: {
     padding: 10,
+    backgroundColor: '#007bff',
+    borderRadius: 8,
+    alignSelf: 'center',
+  },
+  editButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });
 

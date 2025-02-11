@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, Button, StyleSheet, Text } from 'react-native';
+import { View, TextInput, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface LoginScreenProps {
@@ -9,12 +9,13 @@ interface LoginScreenProps {
 const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
   const [pin, setPin] = useState('');
   const [storedPin, setStoredPin] = useState('');
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchStoredPin = async () => {
-      const pin = await AsyncStorage.getItem('appPin');
-      if (pin) {
-        setStoredPin(pin);
+      const pinValue = await AsyncStorage.getItem('appPin');
+      if (pinValue) {
+        setStoredPin(pinValue);
       } else {
         onLogin(); // No PIN set, proceed to the app
       }
@@ -26,7 +27,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
     if (pin === storedPin) {
       onLogin();
     } else {
-      alert('Incorrect PIN');
+      setError('Incorrect PIN');
     }
   };
 
@@ -36,16 +37,24 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Enter PIN</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="PIN"
-        value={pin}
-        onChangeText={setPin}
-        secureTextEntry
-        keyboardType="numeric"
-      />
-      <Button title="Login" onPress={handleLogin} />
+      <View style={styles.card}>
+        <Text style={styles.title}>Enter PIN</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="PIN"
+          value={pin}
+          onChangeText={(text) => {
+            setPin(text);
+            setError('');
+          }}
+          secureTextEntry
+          keyboardType="numeric"
+        />
+        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+          <Text style={styles.buttonText}>Login</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -53,20 +62,59 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f5f5f5',
     justifyContent: 'center',
+    alignItems: 'center',
     padding: 16,
+  },
+  card: {
+    backgroundColor: '#fff',
+    width: '90%',
+    borderRadius: 12,
+    padding: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
   },
   title: {
     fontSize: 24,
     marginBottom: 16,
-    textAlign: 'center',
+    fontWeight: 'bold',
+    color: '#333',
   },
   input: {
-    height: 40,
-    borderColor: 'gray',
+    width: '100%',
+    height: 48,
+    borderColor: '#ccc',
     borderWidth: 1,
-    marginBottom: 16,
-    paddingHorizontal: 8,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    marginBottom: 12,
+    fontSize: 16,
+    color: '#333',
+    backgroundColor: '#fafafa',
+  },
+  button: {
+    backgroundColor: '#007bff',
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 10,
+    width: '100%',
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  errorText: {
+    color: '#dc3545',
+    marginBottom: 10,
+    fontSize: 14,
   },
 });
 
